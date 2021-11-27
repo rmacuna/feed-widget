@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { axiosService } from "../..";
+import { Post } from "../post/Post";
 
 const DEFAULT_FEED_URL = process.env.REACT_APP_FEED_URL;
 
@@ -14,34 +15,53 @@ const DEFAULT_FEED_URL = process.env.REACT_APP_FEED_URL;
 export const Feed = ({
   feedUrl = DEFAULT_FEED_URL,
   postsOffset = 7,
-  updateInterval = 50000,
+  updateInterval = 15000,
 }) => {
   const [feed, setFeed] = useState([]);
+  const [lastMostRecent, setLastMostRecent] = useState(null);
+  const interval = useRef(null); // In case you want to add a cancel button to the component
+
+  /**
+   * Initialize the feed with an old postId. The API will not load anymore new feeds since the last post
+   * is from two years before. The only way to get "new posts" is to load from a specific point in the past of
+   * the feed.
+   */
+  useEffect(() => {
+    async function intialOldFeed() {
+      const response = await axiosService.get(feedUrl, {
+        params: { limit: postsOffset, from_id: "twitter:946553740861026309" },
+      });
+      setFeed(response.data);
+      setLastMostRecent(response.data[0]?.entity_id);
+    }
+    intialOldFeed();
+  }, [feedUrl, postsOffset]);
 
   useEffect(() => {
-    axiosService
-      .get(feedUrl, {
-        params: {
-          limit: postsOffset,
-        },
-      })
-      .then((result) => {
-        if (!result.data) return;
-        const feed = result.data;
-        setFeed(feed);
+    async function fetchFeed() {
+      const response = await axiosService.get(feedUrl, {
+        params: { limit: postsOffset, from_id: lastMostRecent },
       });
-  }, [feedUrl, postsOffset]);
+      setFeed(response.data);
+      setLastMostRecent(response.data[0].entity_id);
+    }
+    interval.current = setInterval(() => {
+      fetchFeed();
+    }, updateInterval);
+
+    return () => clearInterval(interval.current);
+  }, [feedUrl, postsOffset, updateInterval, lastMostRecent]);
 
   return (
     <div>
       <h1>Feed of: {feedUrl}</h1>
-
-      {feed.map((post) => (
-        <div key={post.id}>
-          <h2>{post.title}</h2>
-          <p>{post.text}</p>
-          time: {new Date(post.created_at).toLocaleString()}
-        </div>
+      {feed.map(({ id, user, created_at, text }) => (
+        <Post
+          key={id}
+          author={user.name}
+          createdAt={created_at}
+          messageBody={text}
+        />
       ))}
     </div>
   );
