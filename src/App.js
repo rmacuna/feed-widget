@@ -1,9 +1,15 @@
 import "./App.css";
 import { Feed } from "./components/feed/Feed";
 import PropTypes from "prop-types";
+import { GlobalStyles } from "./globalStyles";
 
 function App(props) {
-  return <Feed {...props} />;
+  return (
+    <>
+      <GlobalStyles />
+      <Feed {...props} />
+    </>
+  );
 }
 
 App.propTypes = {

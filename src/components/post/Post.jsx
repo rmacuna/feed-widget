@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
+import { Card, CardContent, CardTimestamp, CardTitle } from "./Post.styles";
 
 export const Post = ({ createdAt, author, messageBody }) => {
   return (
-    <div>
-      <h2>{author}</h2>
-      <p>{messageBody}</p>
-      time: {new Date(createdAt).toLocaleString()}
-    </div>
+    <Card>
+      <CardTitle>{author}</CardTitle>
+      <CardTimestamp>{new Date(createdAt).toLocaleString()}</CardTimestamp>
+      <CardContent>{messageBody}</CardContent>
+    </Card>
   );
 };
 

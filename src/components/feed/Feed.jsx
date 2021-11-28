@@ -2,6 +2,13 @@ import { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { axiosService } from "../..";
 import { Post } from "../post/Post";
+import {
+  FeedBackground,
+  FeedContainer,
+  FeedGrid,
+  FeedScrollContainer,
+  FeedTitle,
+} from "./Feed.styles";
 
 const DEFAULT_FEED_URL = process.env.REACT_APP_FEED_URL;
 
@@ -14,7 +21,7 @@ const DEFAULT_FEED_URL = process.env.REACT_APP_FEED_URL;
  */
 export const Feed = ({
   feedUrl = DEFAULT_FEED_URL,
-  postsOffset = 7,
+  postsOffset = 15,
   updateInterval = 15000,
 }) => {
   const [feed, setFeed] = useState([]);
@@ -53,17 +60,22 @@ export const Feed = ({
   }, [feedUrl, postsOffset, updateInterval, lastMostRecent]);
 
   return (
-    <div>
-      <h1>Feed of: {feedUrl}</h1>
-      {feed.map(({ id, user, created_at, text }) => (
-        <Post
-          key={id}
-          author={user.name}
-          createdAt={created_at}
-          messageBody={text}
-        />
-      ))}
-    </div>
+    <FeedContainer>
+      <FeedBackground />
+      <FeedTitle>What people is talking about</FeedTitle>
+      <FeedScrollContainer>
+        <FeedGrid>
+          {feed.map(({ id, user, created_at, text }) => (
+            <Post
+              key={id}
+              author={user.name}
+              createdAt={created_at}
+              messageBody={text}
+            />
+          ))}
+        </FeedGrid>
+      </FeedScrollContainer>
+    </FeedContainer>
   );
 };
 
