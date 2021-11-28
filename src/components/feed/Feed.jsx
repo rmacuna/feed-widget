@@ -117,7 +117,7 @@ export const Feed = ({
       <FeedBackground />
       <FeedTitle>What people is talking about</FeedTitle>
       <FeedScrollContainer>
-        <FeedGrid>{renderFeed()}</FeedGrid>
+        <FeedGrid role="list">{renderFeed()}</FeedGrid>
       </FeedScrollContainer>
     </FeedContainer>
   );

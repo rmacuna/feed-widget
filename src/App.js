@@ -2,7 +2,7 @@ import { Feed } from "./components/feed/Feed";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "./globalStyles";
 
-function App(props) {
+export function App(props) {
   return (
     <>
       <GlobalStyles />
@@ -16,5 +16,3 @@ App.propTypes = {
   postsOffset: PropTypes.number,
   updateInterval: PropTypes.number,
 };
-
-export default App;

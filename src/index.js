@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
+import { App } from "./App";
+// import reportWebVitals from "./reportWebVitals";
 import axios from "axios";
 
 axios.defaults.headers = {
@@ -17,5 +17,3 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById("feed-widget-container")
 );
-
-reportWebVitals();

@@ -5,7 +5,7 @@ import ReactLinkify from "react-linkify";
 
 export const Post = ({ createdAt, author, messageBody }) => {
   return (
-    <Card>
+    <Card role="listitem">
       <CardTitle>{author}</CardTitle>
       <CardTimestamp>{formatDate(createdAt)}</CardTimestamp>
       <CardContent>
