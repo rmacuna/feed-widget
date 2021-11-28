@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Card = styled.div`
+export const Card = styled.li`
   margin-bottom: 1rem;
   padding: 1rem;
   background-color: #f9fafb;
@@ -24,4 +24,10 @@ export const CardTimestamp = styled.p`
 export const CardContent = styled.p`
   font-size: 0.938rem;
   margin-bottom: 1rem;
+  a {
+    color: #399cc6;
+  }
+  a:visited {
+    color: #4b15a4;
+  }
 `;

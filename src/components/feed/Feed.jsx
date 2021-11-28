@@ -5,10 +5,13 @@ import { Post } from "../post/Post";
 import {
   FeedBackground,
   FeedContainer,
+  FeedErrorContainer,
   FeedGrid,
   FeedScrollContainer,
+  FeedSkeleton,
   FeedTitle,
 } from "./Feed.styles";
+import { Box } from "../common-ui/Box";
 
 const DEFAULT_FEED_URL = process.env.REACT_APP_FEED_URL;
 
@@ -26,6 +29,8 @@ export const Feed = ({
 }) => {
   const [feed, setFeed] = useState([]);
   const [lastMostRecent, setLastMostRecent] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
   const interval = useRef(null); // In case you want to add a cancel button to the component
 
   /**
@@ -35,22 +40,39 @@ export const Feed = ({
    */
   useEffect(() => {
     async function intialOldFeed() {
-      const response = await axiosService.get(feedUrl, {
-        params: { limit: postsOffset, from_id: "twitter:946553740861026309" },
-      });
-      setFeed(response.data);
-      setLastMostRecent(response.data[0]?.entity_id);
+      try {
+        setIsLoading(true);
+        const response = await axiosService.get(feedUrl, {
+          params: { limit: postsOffset, from_id: "twitter:946553740861026309" },
+        });
+        setFeed(response.data);
+        setLastMostRecent(response.data[0]?.entity_id);
+      } catch (error) {
+        setError("Error while loading the feed, please try again");
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     intialOldFeed();
   }, [feedUrl, postsOffset]);
 
   useEffect(() => {
     async function fetchFeed() {
-      const response = await axiosService.get(feedUrl, {
-        params: { limit: postsOffset, from_id: lastMostRecent },
-      });
-      setFeed(response.data);
-      setLastMostRecent(response.data[0].entity_id);
+      try {
+        setIsLoading(true);
+        const response = await axiosService.get(feedUrl, {
+          params: { limit: postsOffset, from_id: lastMostRecent },
+        });
+        if (response.data.length > 0) {
+          setFeed(response.data);
+          setLastMostRecent(response.data[0].entity_id);
+        }
+      } catch (error) {
+        setError("Error while loading the feed, please try again");
+      } finally {
+        setIsLoading(false);
+      }
     }
     interval.current = setInterval(() => {
       fetchFeed();
@@ -59,21 +81,43 @@ export const Feed = ({
     return () => clearInterval(interval.current);
   }, [feedUrl, postsOffset, updateInterval, lastMostRecent]);
 
+  const renderFeed = () => {
+    if (isLoading) {
+      return new Array(postsOffset).fill(0).map((_, index) => (
+        <Box width="100%" height="230px" key={index}>
+          <FeedSkeleton borderRadius="20px" />
+        </Box>
+      ));
+    }
+    if (error) {
+      <FeedErrorContainer>
+        <FeedTitle>{error}</FeedTitle>
+      </FeedErrorContainer>;
+    }
+
+    if (feed.length === 0)
+      return (
+        <Box width="100%" height="100%">
+          <p>No more news to show</p>
+        </Box>
+      );
+
+    return feed.map(({ id, user, created_at, text }) => (
+      <Post
+        key={id}
+        author={user.name}
+        createdAt={created_at}
+        messageBody={text}
+      />
+    ));
+  };
+
   return (
     <FeedContainer>
       <FeedBackground />
       <FeedTitle>What people is talking about</FeedTitle>
       <FeedScrollContainer>
-        <FeedGrid>
-          {feed.map(({ id, user, created_at, text }) => (
-            <Post
-              key={id}
-              author={user.name}
-              createdAt={created_at}
-              messageBody={text}
-            />
-          ))}
-        </FeedGrid>
+        <FeedGrid>{renderFeed()}</FeedGrid>
       </FeedScrollContainer>
     </FeedContainer>
   );

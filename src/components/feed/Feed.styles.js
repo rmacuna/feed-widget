@@ -7,7 +7,6 @@ export const FeedContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: ;
 `;
 
 export const FeedBackground = styled.aside`
@@ -31,6 +30,33 @@ export const FeedScrollContainer = styled.div`
   max-height: 1200px;
 `;
 
+export const FeedSkeleton = styled.div`
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(-90deg, #f0f0f0 0%, #f8f8f8 50%, #f0f0f0 100%);
+  background-size: 400% 400%;
+  border-radius: ${(props) => props.borderRadius};
+  animation: pulse 1.2s ease-in-out infinite;
+  @keyframes pulse {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: -135% 0%;
+    }
+  }
+`;
+
+export const FeedErrorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+`;
+
 export const FeedTitle = styled.h1`
   font-size: 3rem;
   font-weight: 900;
@@ -39,11 +65,19 @@ export const FeedTitle = styled.h1`
   text-align: center;
 `;
 
-export const FeedGrid = styled.div`
+export const FeedGrid = styled.ul`
   display: grid;
   grid-template-columns: repeat(3, minmax(300px, 1fr));
   grid-gap: 1rem;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  list-style: none;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+  }
+  @media (max-width: 576px) {
+    grid-template-columns: repeat(1, minmax(300px, 1fr));
+  }
 `;
